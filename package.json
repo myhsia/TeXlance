@@ -1,0 +1,156 @@
+{
+  "name": "texlance",
+  "displayName": "TeXlance",
+  "description": "Pylance-style LaTeX preamble intelligence: resolves \\usepackage, \\RequirePackage and \\documentclass against kpsewhich and reports unresolved packages, plus path-aware completions.",
+  "version": "0.1.0",
+  "publisher": "myhsia",
+  "license": "MIT",
+  "private": true,
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.91.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "latex",
+    "tex",
+    "kpsewhich",
+    "texlive",
+    "miktex",
+    "preamble",
+    "usepackage",
+    "documentclass",
+    "language-server",
+    "lsp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/myhsia/TeXlance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/myhsia/TeXlance/issues"
+  },
+  "homepage": "https://github.com/myhsia/TeXlance#readme",
+  "main": "./dist/extension.js",
+  "workspaces": [
+    "core",
+    "server"
+  ],
+  "activationEvents": [
+    "onLanguage:latex",
+    "onLanguage:tex",
+    "workspaceContains:**/*.tex",
+    "onCommand:texlance.refreshPackageIndex",
+    "onCommand:texlance.showOutput",
+    "onCommand:texlance.restartServer"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "TeXlance",
+      "properties": {
+        "texlance.analysis.extraPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Additional paths searched **recursively** (depth-capped) for `.sty`/`.cls` files when resolving `\\usepackage`, `\\RequirePackage` and `\\documentclass`. Relative paths are resolved against the workspace folder. Mirrors `python.analysis.extraPaths`."
+        },
+        "texlance.analysis.reportMissingPackages": {
+          "type": "string",
+          "enum": [
+            "none",
+            "information",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "scope": "resource",
+          "markdownDescription": "Severity of the `reportMissingPackages` diagnostic raised for a package or class that cannot be resolved by `kpsewhich`, an extra path or the document folder."
+        },
+        "texlance.kpsewhichPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "scope": "machine-overridable",
+          "markdownDescription": "Absolute path to the `kpsewhich` executable. Leave empty to auto-detect (`PATH`, `/Library/TeX/texbin`, TeX Live and MiKTeX installs)."
+        },
+        "texlance.preamble.maxLines": {
+          "type": "integer",
+          "default": 500,
+          "minimum": 1,
+          "scope": "resource",
+          "markdownDescription": "Maximum number of lines scanned for preamble commands. The scan always stops early at `\\begin{document}`."
+        },
+        "texlance.completion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Offer command, package and class completions."
+        },
+        "texlance.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "scope": "window",
+          "description": "Trace the communication between VS Code and the TeXlance language server."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "texlance.refreshPackageIndex",
+        "title": "Refresh Package Index",
+        "category": "TeXlance",
+        "description": "Re-scan kpsewhich (ls-R) databases, extra paths and the workspace for .sty/.cls files."
+      },
+      {
+        "command": "texlance.showOutput",
+        "title": "Show Output",
+        "category": "TeXlance"
+      },
+      {
+        "command": "texlance.restartServer",
+        "title": "Restart Language Server",
+        "category": "TeXlance"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "build:tests": "node esbuild.mjs --tests",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p core/tsconfig.json --noEmit && tsc -p server/tsconfig.json --noEmit && tsc -p tsconfig.json --noEmit",
+    "test:unit": "vitest run",
+    "pretest:integration": "npm run build && npm run build:tests",
+    "test:integration": "node test/integration/out/runTest.js",
+    "test": "npm run typecheck && npm run test:unit",
+    "package": "npm run build && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run build"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^10.1.2"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.12.0",
+    "@types/vscode": "1.91.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "mocha": "^10.8.2",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.5"
+  }
+}

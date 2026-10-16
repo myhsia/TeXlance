@@ -1,0 +1,11 @@
+node_modules/
+dist/
+test/integration/out/
+coverage/
+*.vsix
+*.log
+.DS_Store
+.vscode-test/
+
+# Keep the fixture workspace settings tracked, ignore the developer's own.
+/.vscode/

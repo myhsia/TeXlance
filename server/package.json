@@ -1,0 +1,13 @@
+{
+  "name": "texlance-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TeXlance language server.",
+  "license": "MIT",
+  "main": "./src/server.ts",
+  "dependencies": {
+    "@texlance/core": "*",
+    "vscode-languageserver": "^10.1.2",
+    "vscode-languageserver-textdocument": "^1.0.15"
+  }
+}

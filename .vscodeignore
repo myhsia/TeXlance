@@ -1,0 +1,17 @@
+.github/**
+.vscode/**
+.vscode-test/**
+scripts/**
+core/**
+server/**
+src/**
+test/**
+node_modules/**
+dist/**/*.map
+**/*.ts
+**/*.mjs
+tsconfig*.json
+vitest.config.mts
+.gitignore
+.editorconfig
+icon.svg

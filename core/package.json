@@ -1,0 +1,13 @@
+{
+  "name": "@texlance/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Editor-agnostic TeX preamble parsing, kpsewhich resolution and completion logic for TeXlance.",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "vscode-languageserver-textdocument": "^1.0.15",
+    "vscode-languageserver-types": "^3.18.4"
+  }
+}
