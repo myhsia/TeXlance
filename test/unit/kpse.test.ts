@@ -18,6 +18,16 @@ describe('Kpse.candidates', () => {
     const candidates = Kpse.candidates({ env: { PATH: '' }, platform: 'darwin' });
     expect(candidates).toContain('/Library/TeX/texbin/kpsewhich');
   });
+
+  it('joins with the requested platform rules rather than the host rules', () => {
+    // Regression guard: the host may be Windows while we ask for Linux paths.
+    expect(Kpse.candidates({ env: { PATH: '/opt/texbin' }, platform: 'linux' })).toContain(
+      '/opt/texbin/kpsewhich',
+    );
+    expect(Kpse.candidates({ env: { PATH: 'C:\\texbin' }, platform: 'win32' })).toContain(
+      'C:\\texbin\\kpsewhich.exe',
+    );
+  });
 });
 
 describe('Kpse.discover', () => {

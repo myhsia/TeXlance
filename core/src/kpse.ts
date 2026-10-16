@@ -97,7 +97,12 @@ export class Kpse {
   static candidates(options: KpseDiscoveryOptions = {}): string[] {
     const platform = options.platform ?? process.platform;
     const env = options.env ?? process.env;
-    const exe = platform === 'win32' ? 'kpsewhich.exe' : 'kpsewhich';
+    const isWindows = platform === 'win32';
+    // Join with the requested platform's rules, not the host's, so the result
+    // is deterministic no matter where this runs (e.g. Windows CI asking for
+    // the Linux candidate list).
+    const join = isWindows ? path.win32.join : path.posix.join;
+    const exe = isWindows ? 'kpsewhich.exe' : 'kpsewhich';
     const result: string[] = [];
     const push = (candidate: string | null | undefined): void => {
       if (candidate && candidate.trim().length > 0 && !result.includes(candidate)) {
@@ -108,22 +113,21 @@ export class Kpse {
     push(options.executable);
 
     const pathValue = env.PATH ?? (env as Record<string, string | undefined>).Path ?? '';
-    const separator = platform === 'win32' ? ';' : ':';
-    for (const directory of pathValue.split(separator)) {
+    for (const directory of pathValue.split(isWindows ? ';' : ':')) {
       if (directory.length > 0) {
-        push(path.join(directory, exe));
+        push(join(directory, exe));
       }
     }
 
-    if (platform === 'win32') {
+    if (isWindows) {
       const localAppData = env.LOCALAPPDATA;
       const programFiles = env.ProgramFiles;
       if (localAppData) {
-        push(path.join(localAppData, 'Programs', 'MiKTeX', 'miktex', 'bin', 'x64', exe));
-        push(path.join(localAppData, 'Programs', 'MiKTeX', 'miktex', 'bin', exe));
+        push(join(localAppData, 'Programs', 'MiKTeX', 'miktex', 'bin', 'x64', exe));
+        push(join(localAppData, 'Programs', 'MiKTeX', 'miktex', 'bin', exe));
       }
       if (programFiles) {
-        push(path.join(programFiles, 'MiKTeX', 'miktex', 'bin', 'x64', exe));
+        push(join(programFiles, 'MiKTeX', 'miktex', 'bin', 'x64', exe));
       }
     } else {
       push(`/Library/TeX/texbin/${exe}`);
@@ -133,15 +137,14 @@ export class Kpse {
       push(`/usr/bin/${exe}`);
     }
 
-    const texLiveRoots =
-      platform === 'win32'
-        ? ['C:\\texlive', 'C:\\Program Files\\texlive']
-        : ['/usr/local/texlive', '/opt/texlive', '/usr/local/TeX'];
+    const texLiveRoots = isWindows
+      ? ['C:\\texlive', 'C:\\Program Files\\texlive']
+      : ['/usr/local/texlive', '/opt/texlive', '/usr/local/TeX'];
     for (const root of texLiveRoots) {
       for (const year of listDirectories(root).sort(numericDescending)) {
-        const binDirectory = path.join(root, year, 'bin');
+        const binDirectory = join(root, year, 'bin');
         for (const arch of listDirectories(binDirectory).sort()) {
-          push(path.join(binDirectory, arch, exe));
+          push(join(binDirectory, arch, exe));
         }
       }
     }
