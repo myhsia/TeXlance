@@ -78,6 +78,18 @@ replaced. The PAT must belong to the account that owns the publisher, and the
   chunk-CRC walk before blaming the package.
 - `vsce publish` with no token fails as
   `TF400813: The user 'aaaaaaaa-…' is not authorized to access this resource`.
+- `--skip-duplicate` looks the version up **before** uploading and returns
+  early, so it can report success without ever exercising the token. Verify the
+  secret separately (`vsce verify-pat <publisher>`), or a mis-scoped PAT will
+  only surface on the next real version bump.
+- Right after the first publish the gallery API can report the extension as
+  public while `marketplace.visualstudio.com/items?itemName=<publisher>.<ext>`
+  still returns 404. It propagates within minutes; confirm against the CDN
+  assets instead of panicking:
+  `https://<publisher>.gallerycdn.vsassets.io/extensions/<publisher>/<ext>/<version>/<timestamp>/Microsoft.VisualStudio.Services.VSIXPackage`.
+- Two VSIXes with byte-identical contents can still have different `sha256`
+  sums, because zip entries embed DOS timestamps. Compare per-entry hashes
+  before concluding an artifact differs.
 - `gh release upload --clobber` refreshes an asset but does **not** move the
   tag; re-point the tag if the published source must match the artifact.
 - A PAT scoped to one organization, or belonging to a different account than the
