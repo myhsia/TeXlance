@@ -7,6 +7,9 @@ server/**
 src/**
 test/**
 node_modules/**
+.opencode/**
+AGENTS.md
+*.tex
 dist/**/*.map
 **/*.ts
 **/*.mjs

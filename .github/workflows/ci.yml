@@ -80,3 +80,35 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: '*.vsix'
+
+  publish:
+    name: Publish to Marketplace
+    needs: package
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run package
+
+      - name: Check for VSCE_PAT
+        id: token
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -n "$VSCE_PAT" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::VSCE_PAT is not set; skipping the Marketplace publish."
+          fi
+
+      - name: Publish
+        if: steps.token.outputs.present == 'true'
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --packagePath "$(ls *.vsix)" --skip-duplicate
