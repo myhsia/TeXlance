@@ -106,7 +106,9 @@ npm run test:integration   # end-to-end tests in a real VS Code
 npm run package      # produce texlance-0.1.0.vsix
 ```
 
-Press <kbd>F5</kbd> in VS Code to launch an Extension Development Host.
+Press <kbd>F5</kbd> in VS Code to launch an Extension Development Host with the
+fixture workspace open — the **Run Extension** launch configuration does that,
+and **Extension Tests** runs the integration suite.
 
 ### Layout
 

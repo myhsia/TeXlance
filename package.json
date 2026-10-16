@@ -129,6 +129,7 @@
   },
   "scripts": {
     "build": "node esbuild.mjs",
+    "build:all": "npm run build && npm run build:tests",
     "build:tests": "node esbuild.mjs --tests",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc -p core/tsconfig.json --noEmit && tsc -p server/tsconfig.json --noEmit && tsc -p tsconfig.json --noEmit",
