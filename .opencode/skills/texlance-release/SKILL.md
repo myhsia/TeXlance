@@ -36,11 +36,28 @@ enough, and `vsce login` only prompts for an existing token.
    single-org choice fails publishing.
 4. Scopes → **Custom defined** → expand **Marketplace** → tick **Manage**.
 5. Create and copy the token immediately; Azure DevOps shows it once.
-6. Store it:
+6. Store it. For CI (recommended):
 
    ```sh
-   gh secret set VSCE_PAT        # for CI, interactively
-   vsce login <publisher>        # or locally, paste at the prompt
+   gh secret set VSCE_PAT        # interactively; the workflow reads secrets.VSCE_PAT
+   ```
+
+   For local publishing, `vsce login` persists the token to the **OS keychain**
+   (macOS Keychain / Windows Credential Manager / libsecret), under service
+   `vscode-vsce` and account = publisher name — **not** `~/.vsce`. Set
+   `VSCE_STORE=file` to use `~/.vsce` instead.
+
+   ```sh
+   vsce login <publisher>        # paste at the prompt
+   # history-safe alternative, avoids the token in shell history and ps:
+   read -rs "PAT?PAT: " && VSCE_PAT="$PAT" npx vsce publish --packagePath ./*.vsix; unset PAT
+   ```
+
+7. Prove the token works before publishing:
+
+   ```sh
+   vsce ls-publishers            # lists publishers reachable with the stored PAT
+   vsce verify-pat <publisher>   # "The Personal Access Token verification succeeded …"
    ```
 
 The token expires; when it does, CI publishing fails and the secret must be
@@ -64,3 +81,10 @@ replaced. The PAT must belong to the account that owns the publisher, and the
   tag; re-point the tag if the published source must match the artifact.
 - A PAT scoped to one organization, or belonging to a different account than the
   publisher, produces authorization errors that look like package problems.
+- A missing `~/.vsce` is **expected** — `vsce login` uses the OS keychain
+  (service `vscode-vsce`, account = publisher). Check the keychain with
+  `security find-generic-password -s vscode-vsce -a <publisher>` (attributes
+  only; never pass `-w`, which prints the secret).
+- Publish with `vsce publish --packagePath <file>` after `npm run package`, or
+  pass `--no-dependencies`. A bare `vsce publish` re-packages without that flag
+  and tries to bundle `node_modules`, even though `dist/` is already bundled.
