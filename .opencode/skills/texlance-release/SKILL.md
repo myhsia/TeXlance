@@ -16,7 +16,8 @@ Marketplace upload or publish failure.
 2. `git tag -a vX.Y.Z -m "TeXlance vX.Y.Z" && git push origin main vX.Y.Z`.
 3. CI runs: matrix tests → `Package VSIX` (artifact `texlance-vsix`) →
    `Publish release` on `refs/tags/v*`, attaching the VSIX via
-   `softprops/action-gh-release` → `Publish to Marketplace` if `VSCE_PAT` is set.
+   `softprops/action-gh-release` → `Publish to Marketplace` if `VSCE_PAT` is
+   set, which first proves the secret with `vsce verify-pat <publisher>`.
 4. Verify with `gh release view vX.Y.Z --json assets`.
 
 To publish without cutting a tag, run the workflow manually:

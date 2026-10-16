@@ -107,6 +107,12 @@ jobs:
             echo "::warning::VSCE_PAT is not set; skipping the Marketplace publish."
           fi
 
+      - name: Verify the token
+        if: steps.token.outputs.present == 'true'
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce verify-pat "$(node -p "require('./package.json').publisher")"
+
       - name: Publish
         if: steps.token.outputs.present == 'true'
         env:
