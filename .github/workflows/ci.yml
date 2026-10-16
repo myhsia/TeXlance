@@ -111,4 +111,4 @@ jobs:
         if: steps.token.outputs.present == 'true'
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: npx vsce publish --packagePath "$(ls *.vsix)" --skip-duplicate
+        run: npx vsce publish --packagePath ./*.vsix --skip-duplicate
