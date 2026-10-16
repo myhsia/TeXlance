@@ -1,7 +1,7 @@
 {
   "name": "texlance",
   "displayName": "TeXlance",
-  "description": "Pylance-style LaTeX preamble intelligence: resolves \\usepackage, \\RequirePackage and \\documentclass against kpsewhich and reports unresolved packages, plus path-aware completions.",
+  "description": "Pylance-style LaTeX preamble intelligence for VS Code: resolves the preamble against kpsewhich and reports unresolved packages, plus path-aware completions.",
   "version": "0.1.0",
   "publisher": "myhsia",
   "license": "MIT",
